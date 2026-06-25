@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Execution | LifeSaver AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .lofi-border { border: 2px solid #3a3a40; }
+        .bg-midnight { background-color: #121214; }
+        .bg-card-dark { background-color: #1a1a1e; }
+        .text-pastel-purple { color: #bca0dc; }
+        .text-pastel-pink { color: #f2afcd; }
+        .accent-pastel { accent-color: #bca0dc; }
+    </style>
+</head>
+<body class="bg-midnight text-gray-200 min-h-screen font-sans tracking-wide">
+
+    <nav class="bg-card-dark border-b-2 border-[#2b2b30] px-6 py-4 flex justify-between items-center shadow-md">
+        <div class="flex items-center gap-2">
+            <span class="text-2xl">🌙</span>
+            <a href="index.html" class="text-xl font-black text-pastel-purple tracking-wider">LIFESAVER AI</a>
+        </div>
+        <div class="flex gap-6 text-xs font-bold uppercase tracking-widest text-gray-400">
+            <a href="index.html" class="hover:text-pastel-purple transition">🏠 Dashboard</a>
+            <a href="triage.html" class="hover:text-pastel-purple transition">🧠 Panic Room</a>
+            <a href="defcon.html" class="hover:text-pastel-purple transition">⚠️ DEFCON Hub</a>
+            <a href="calendar.html" class="hover:text-pastel-purple transition">📅 Tactical Calendar</a>
+            <a href="autonomous.html" class="text-pastel-pink border-b border-pastel-pink pb-1">🤖 Agent Execution</a>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto p-6 space-y-6 mt-6">
+        <div class="flex items-center justify-between border-b border-[#2b2b30] pb-4">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">🤖</span>
+                <h2 class="text-xl font-black uppercase tracking-widest text-indigo-300">Autonomous Delegation Core</h2>
+            </div>
+            <p class="text-xs text-gray-500 font-mono">STATUS: AGENT MATRIX LINKED</p>
+        </div>
+
+        <div id="autonomous-execution-list" class="space-y-4">
+            </div>
+    </main>
+
+    <script>
+        function renderAutonomousMatrix() {
+            const data = JSON.parse(localStorage.getItem('triage_data')) || { triage_plan: [] };
+            const container = document.getElementById('autonomous-execution-list');
+            container.innerHTML = '';
+
+            if (data.triage_plan.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-16 bg-card-dark lofi-border rounded-2xl text-gray-500 text-sm">
+                        No automation vectors tracked.<br>
+                        Add active constraints within your Panic Room workspace to trigger logic.
+                    </div>`;
+                return;
+            }
+
+            data.triage_plan.forEach((task, idx) => {
+                const card = document.createElement('div');
+                card.className = `bg-card-dark p-5 rounded-xl lofi-border flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition ${task.completed ? 'opacity-30' : ''}`;
+                
+                let checkedState = task.completed ? 'checked' : '';
+                let textStrike = task.completed ? 'line-through text-gray-600' : 'text-gray-100';
+
+                card.innerHTML = `
+                    <div class="flex items-start gap-4 flex-1">
+                        <div class="mt-1">
+                            <input type="checkbox" ${checkedState} onchange="toggleAutonomousTaskState(${idx})" class="w-5 h-5 accent-pastel rounded cursor-pointer">
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-base ${textStrike}">${task.task_title}</h3>
+                            <p class="text-xs text-gray-400 mt-0.5">⏱️ Scheduled Execution Window: ${task.time_block}</p>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <button onclick="triggerAutonomousDraftGeneration('${task.task_title.replace(/'/g, "\\'")}')" 
+                            class="w-full sm:w-auto text-xs bg-indigo-950/60 text-indigo-300 border border-indigo-900/60 hover:bg-indigo-900 hover:text-white font-mono uppercase font-bold tracking-widest px-4 py-2.5 rounded-lg transition duration-150">
+                            🤖 Run Agent Draft
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Simulates the operational execution phase output layer for high agency functionality
+        function triggerAutonomousDraftGeneration(taskTitle) {
+            const userValidation = prompt(`🤖 AI Agent initiating communication compilation script protocol.\n\nDo you want to extract a contextual messaging blueprint draft template for: "${taskTitle}"? (Type 'yes' or 'no')`, "yes");
+            
+            if (userValidation && userValidation.toLowerCase() === 'yes') {
+                alert(`✨ [AUTONOMOUS ENGINE OUTPUT DRAFT]:\n\n"Hey there,\n\nI am reaching out regarding '${taskTitle}' which is currently queued in my direct optimization timeline. I am compiling the operational variables and will provide a status update over the upcoming execution window.\n\nBest,\n[Your Signature Tracker]"`);
+            }
+        }
+
+        // Synchronized task controller updates central engine array 
+        function toggleAutonomousTaskState(idx) {
+            let data = JSON.parse(localStorage.getItem('triage_data'));
+            data.triage_plan[idx].completed = !data.triage_plan[idx].completed;
+            localStorage.setItem('triage_data', JSON.stringify(data));
+            renderAutonomousMatrix(); // redraw state layout elements instantly
+        }
+
+        window.onload = renderAutonomousMatrix;
+    </script>
+</body>
+</html>
