@@ -3,167 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Last-Minute Life Saver</title>
+    <title>Dashboard | LifeSaver AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles to match the cute Lo-Fi study planner theme exactly */
+        .lofi-border { border: 2px solid #3a3a40; }
+        .dotted-line { border-bottom: 2px dotted #3a3a40; }
+        .bg-midnight { background-color: #121214; }
+        .bg-card-dark { background-color: #1a1a1e; }
+        .text-pastel-purple { color: #bca0dc; }
+        .text-pastel-pink { color: #f2afcd; }
+        .accent-pastel { accent-color: #bca0dc; }
+    </style>
 </head>
-<body class="bg-gray-900 text-gray-100 min-h-screen font-sans">
+<body class="bg-midnight text-gray-200 min-h-screen font-sans tracking-wide">
 
-    <div class="max-w-4xl mx-auto p-6">
-        <header class="text-center my-10">
-            <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-400 mb-2">
-                🚨 The Last-Minute Life Saver
-            </h1>
-            <p class="text-gray-400 text-lg">Turn your chaotic brain dump into an immediate, stress-free action plan.</p>
-        </header>
+    <nav class="bg-card-dark border-b-2 border-[#2b2b30] px-6 py-4 flex justify-between items-center shadow-md">
+        <div class="flex items-center gap-2">
+            <span class="text-2xl">🌙</span>
+            <a href="index.html" class="text-xl font-black text-pastel-purple tracking-wider">LIFESAVER AI</a>
+        </div>
+        <div class="flex gap-6 text-xs font-bold uppercase tracking-widest text-gray-400">
+            <a href="index.html" class="text-pastel-pink border-b border-pastel-pink pb-1">🏠 Dashboard</a>
+            <a href="triage.html" class="hover:text-pastel-purple transition">🧠 Panic Room</a>
+            <a href="defcon.html" class="hover:text-pastel-purple transition">⚠️ DEFCON Hub</a>
+            <a href="calendar.html" class="hover:text-pastel-purple transition">📅 Tactical Calendar</a>
+            <a href="autonomous.html" class="hover:text-pastel-purple transition">🤖 Agent Execution</a>
+        </div>
+    </nav>
 
-        <main class="space-y-8">
-            <section class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl">
-                <label for="brainDump" class="block text-sm font-semibold text-gray-300 mb-2">
-                    What are you panicking or stressed about right now?
-                </label>
-                <textarea id="brainDump" rows="4" 
-                    class="w-full bg-gray-900 border border-gray-700 rounded-xl p-4 text-gray-100 focus:ring-2 focus:ring-orange-500 focus:outline-none placeholder-gray-500"
-                    placeholder="Example: I have a massive math test tomorrow at 9 AM, I haven't studied, my room is a mess, and I forgot to pay my internet bill tonight..."></textarea>
-                
-                <div class="mt-4 flex gap-3">
-                    <button id="triageBtn" class="flex-1 bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-500 hover:to-orange-400 text-white font-bold py-3 rounded-xl transition duration-200 shadow-lg shadow-orange-900/30">
-                        ⚡ Triage My Life
-                    </button>
+    <main class="max-w-6xl mx-auto p-6 space-y-6">
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-card-dark p-4 rounded-xl lofi-border flex items-center justify-between">
+                <span class="text-xs font-bold uppercase text-gray-400">📅 SYSTEM RESET DATE:</span>
+                <span id="live-date" class="font-mono text-pastel-purple font-bold">--/--/----</span>
+            </div>
+            <div class="md:col-span-2 bg-card-dark p-4 rounded-xl lofi-border flex items-center gap-4">
+                <span class="text-xs font-bold uppercase text-pastel-pink whitespace-nowrap">✨ CURRENT MOTTO:</span>
+                <div class="w-full text-sm italic text-gray-300">"Plan Today, Achieve Tomorrow 🌟"</div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <div class="lg:col-span-5 bg-card-dark p-6 rounded-2xl lofi-border flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="text-lg">🕒</span>
+                        <h3 class="text-sm font-black uppercase tracking-widest text-pastel-purple">Tactical Schedule Blocks</h3>
+                    </div>
+                    <div id="dashboard-schedule-timeline" class="space-y-4 max-h-[450px] overflow-y-auto pr-2">
+                        </div>
                 </div>
-            </section>
-
-            <div id="loading" class="hidden text-center py-8 space-y-3">
-                <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-orange-500 mx-auto"></div>
-                <p class="text-orange-400 font-medium animate-pulse">Gemini is absorbing your chaos and building a plan...</p>
+                <div class="mt-6 pt-4 border-t border-[#2b2b30]">
+                    <a href="calendar.html" class="w-full text-center text-xs font-bold tracking-widest uppercase text-gray-400 hover:text-pastel-pink block transition">View Full Timeline Details ➜</a>
+                </div>
             </div>
 
-            <section id="resultsContainer" class="hidden space-y-6">
-                <h2 class="text-2xl font-bold border-b border-gray-700 pb-2 text-orange-400">📋 Your Battle Plan</h2>
-                <div id="planList" class="space-y-4"></div>
-            </section>
-        </main>
-    </div>
+            <div class="lg:col-span-7 space-y-6">
+                
+                <div class="bg-card-dark p-5 rounded-2xl lofi-border">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="text-yellow-200">⭐</span>
+                        <h3 class="text-sm font-black uppercase tracking-widest text-yellow-200">Critical Path Focuses</h3>
+                    </div>
+                    <div id="priority-list" class="space-y-2 text-sm text-gray-300">
+                        </div>
+                </div>
+
+                <div class="bg-card-dark p-6 rounded-2xl lofi-border">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span>📋</span>
+                            <h3 class="text-sm font-black uppercase tracking-widest text-pastel-pink">Action Item Checklist</h3>
+                        </div>
+                        <span id="task-counter" class="text-xs font-mono bg-gray-900 px-2 py-0.5 rounded text-gray-400">0/0</span>
+                    </div>
+
+                    <div id="dashboard-main-todo" class="space-y-3 max-h-[250px] overflow-y-auto pr-2">
+                        </div>
+                </div>
+
+            </div>
+        </div>
+
+        <footer class="bg-card-dark p-3 rounded-xl lofi-border text-center text-xs text-gray-500 tracking-wider flex justify-center gap-8 flex-wrap">
+            <span>💧 STAY HYDRATED</span>
+            <span>⏱️ TAKE MICRO BREAKS</span>
+            <span>💤 HONOR SLEEP CUSHIONS</span>
+        </footer>
+
+    </main>
 
     <script>
-        document.getElementById('triageBtn').addEventListener('click', async () => {
-            const brainDumpText = document.getElementById('brainDump').value;
-            const loading = document.getElementById('loading');
-            const resultsContainer = document.getElementById('resultsContainer');
-            const planList = document.getElementById('planList');
+        // Set up the local calendar layout date header parameter value strings dynamically
+        const today = new Date();
+        document.getElementById('live-date').innerText = today.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
 
-            if (!brainDumpText.trim()) {
-                alert("Please drop your stress text first!");
+        function synchronizeAndRenderDashboard() {
+            // Fetch central application engine schema tracking matrix array
+            const data = JSON.parse(localStorage.getItem('triage_data')) || { triage_plan: [] };
+            
+            const timelineContainer = document.getElementById('dashboard-schedule-timeline');
+            const priorityContainer = document.getElementById('priority-list');
+            const checklistContainer = document.getElementById('dashboard-main-todo');
+            const counterBadge = document.getElementById('task-counter');
+
+            // Reset view state layout elements completely before population loop routines
+            timelineContainer.innerHTML = '';
+            priorityContainer.innerHTML = '';
+            checklistContainer.innerHTML = '';
+
+            let totalTasks = data.triage_plan.length;
+            let completedTasks = data.triage_plan.filter(t => t.completed).length;
+            counterBadge.innerText = `${completedTasks}/${totalTasks}`;
+
+            if (totalTasks === 0) {
+                const emptyStateHTML = `
+                    <div class="text-center py-12 border-2 border-dashed border-[#2b2b30] rounded-xl text-gray-500 text-sm">
+                        No active tactical matrix paths data.<br>
+                        <a href="triage.html" class="text-pastel-purple underline mt-2 block font-bold">Go dump your stress to begin ➜</a>
+                    </div>`;
+                timelineContainer.innerHTML = emptyStateHTML;
+                checklistContainer.innerHTML = emptyStateHTML;
+                priorityContainer.innerHTML = '<p class="text-gray-500 text-xs">No active tracks logged.</p>';
                 return;
             }
 
-            // Show loading spinner, hide previous results
-            loading.classList.remove('hidden');
-            resultsContainer.classList.add('hidden');
-            planList.innerHTML = '';
+            // Populate schedule tracks & checklist layers
+            data.triage_plan.forEach((task, index) => {
+                let statusChecked = task.completed ? 'checked' : '';
+                let titleStrike = task.completed ? 'line-through text-gray-500' : 'text-gray-100';
 
-            try {
-                // Call your Node backend port 5000
-                const response = await fetch('http://localhost:5000/api/triage', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ brainDump: brainDumpText })
-                });
+                // 1. Build Time block item rows
+                const blockHTML = `
+                    <div class="flex items-center gap-4 p-2 dotted-line pb-3">
+                        <span class="font-mono text-xs text-pastel-pink bg-gray-900/60 px-2 py-1 rounded border border-[#2b2b30]">${task.time_block}</span>
+                        <div class="text-sm font-semibold truncate ${titleStrike}">${task.task_title}</div>
+                    </div>`;
+                timelineContainer.insertAdjacentHTML('beforeend', blockHTML);
 
-                const data = await response.json();
-                
-                // Map through the JSON tasks generated by Gemini
-                data.triage_plan.forEach((task, index) => {
-                    // Decide color indicator based on urgency levels
-                    let badgeColor = 'bg-yellow-900/50 text-yellow-300 border-yellow-700';
-                    if (task.urgency === 'CRITICAL') badgeColor = 'bg-red-900/50 text-red-300 border-red-700';
-                    if (task.urgency === 'HIGH') badgeColor = 'bg-orange-900/50 text-orange-300 border-orange-700';
-
-                    // Generate checkboxes for micro-steps
-                    const stepsHTML = task.micro_steps.map(step => `
-                        <label class="flex items-start gap-3 text-sm text-gray-300 cursor-pointer hover:text-white transition">
-                            <input type="checkbox" class="mt-1 accent-orange-500 rounded focus:ring-0">
-                            <span>${step}</span>
+                // 2. Build Checklist rows
+                const rowHTML = `
+                    <div class="flex items-center justify-between p-3 bg-midnight rounded-xl border border-[#2b2b30] hover:border-pastel-purple/40 transition">
+                        <label class="flex items-center gap-3 cursor-pointer flex-1">
+                            <input type="checkbox" ${statusChecked} onchange="toggleTaskState(${index})" class="w-4 h-4 accent-pastel rounded cursor-pointer">
+                            <span class="text-sm font-medium ${titleStrike}">${task.task_title}</span>
                         </label>
-                    `).join('');
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded border ${task.urgency === 'CRITICAL' ? 'border-red-900 bg-red-950/40 text-red-400' : 'border-gray-700 bg-gray-800 text-gray-400'}">${task.urgency}</span>
+                    </div>`;
+                checklistContainer.insertAdjacentHTML('beforeend', rowHTML);
+            });
 
-                    // Card template injection containing the active premium features
-                    const cardHTML = `
-                        <div id="task-card-${index}" class="bg-gray-800 p-5 rounded-xl border border-gray-700 shadow-md transition duration-300">
-                            <div class="space-y-2">
-                                <div class="flex items-center justify-between flex-wrap gap-2">
-                                    <div class="flex items-center gap-3">
-                                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold border ${badgeColor}">${task.urgency}</span>
-                                        <span class="text-sm font-medium text-gray-400">⏱️ Scheduled: ${task.time_block}</span>
-                                    </div>
-                                    <div id="defcon-${index}" class="text-xs font-bold px-2 py-1 rounded bg-gray-900 text-gray-400 border border-gray-700 animate-pulse">
-                                        ⏳ Calculating time cushion...
-                                    </div>
-                                </div>
-                                
-                                <h3 class="text-xl font-bold text-white mt-1">${task.task_title}</h3>
-                                
-                                <div class="mt-3 space-y-2 bg-gray-900/40 p-3 rounded-lg border border-gray-700/50">
-                                    ${stepsHTML}
-                                </div>
-
-                                <div class="mt-4 pt-3 border-t border-gray-700/50 flex justify-end">
-                                    <button onclick="triggerAutonomousExecution('${task.task_title.replace(/'/g, "\\'")}')" class="text-xs bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-600 hover:text-white px-3 py-1.5 rounded-lg font-medium transition duration-150 flex items-center gap-1">
-                                        🤖 Autonomous Delegation Draft
-                                    </button>
-                                </div>
-                            </div>
+            // 3. Build Top Priorities List (Extracting up to 3 highest items)
+            const criticalItems = data.triage_plan.filter(t => !t.completed).slice(0, 3);
+            if(criticalItems.length === 0) {
+                priorityContainer.innerHTML = '<p class="text-green-400 text-xs font-bold">🎉 All primary items triaged successfully!</p>';
+            } else {
+                criticalItems.forEach((task, i) => {
+                    priorityContainer.insertAdjacentHTML('beforeend', `
+                        <div class="flex items-center gap-2 font-mono py-1">
+                            <span class="text-pastel-purple font-bold">${i+1}.</span>
+                            <span class="truncate">${task.task_title}</span>
                         </div>
-                    `;
-                    planList.insertAdjacentHTML('beforeend', cardHTML);
-                    
-                    // Activate the countdown logic simulation for the hackathon presentation
-                    simulateDefconReminders(index);
+                    `);
                 });
-
-                // Display finished dashboard items
-                resultsContainer.classList.remove('hidden');
-
-            } catch (err) {
-                console.error(err);
-                alert("Could not connect to backend server. Make sure node server.js is running on port 5000!");
-            } finally {
-                loading.classList.add('hidden');
-            }
-        });
-
-        // Logic to handle changing reminders as time gets critical
-        function simulateDefconReminders(index) {
-            const defconBadge = document.getElementById(`defcon-${index}`);
-            const card = document.getElementById(`task-card-${index}`);
-            
-            // For presentation demo purposes, we cycle the states faster so judges see it immediately
-            const states = [
-                { text: "🟢 DEFCON 3: On Track", style: "text-green-400", border: "border-gray-700" },
-                { text: "🟡 DEFCON 2: 45 Mins Left!", style: "text-orange-400 font-extrabold", border: "border-orange-500/50" },
-                { text: "🔴 DEFCON 1: DO THIS NOW", style: "text-red-500 font-black animate-bounce", border: "border-red-500 shadow-lg shadow-red-900/20" }
-            ];
-            
-            let currentIdx = 0;
-            const interval = setInterval(() => {
-                const elementExists = document.getElementById(`defcon-${index}`);
-                if (!elementExists) return clearInterval(interval);
-                
-                defconBadge.innerText = states[currentIdx].text;
-                defconBadge.className = `text-xs font-bold px-2 py-1 rounded bg-gray-900 ${states[currentIdx].style}`;
-                card.className = `bg-gray-800 p-5 rounded-xl border ${states[currentIdx].border} transition duration-300`;
-                
-                currentIdx = (currentIdx + 1) % states.length;
-            }, 5000); // Cycles every 5 seconds to show your dynamic reminder states cleanly to judges
-        }
-
-        // Function to handle autonomous task message drafting
-        function triggerAutonomousExecution(taskTitle) {
-            const personResponse = prompt("🤖 AI Agent initiating execution. Need an automated email or message draft for this? Type 'yes' to generate:", "yes");
-            
-            if(personResponse && personResponse.toLowerCase() === 'yes') {
-                alert(`Generated high-agency template for "${taskTitle}":\n\n"Hey there, I am currently tracking the progress on ${taskTitle}. Will pass over updates/completion milestones shortly. Thanks for your patience!"`);
             }
         }
+
+        // Mutation tracker updating the centralized datastore state instantly
+        function toggleTaskState(idx) {
+            let data = JSON.parse(localStorage.getItem('triage_data'));
+            data.triage_plan[idx].completed = !data.triage_plan[idx].completed;
+            localStorage.setItem('triage_data', JSON.stringify(data));
+            synchronizeAndRenderDashboard(); // re-trigger drawing arrays updates
+        }
+
+        // Fire rendering on initialization load routines
+        window.onload = synchronizeAndRenderDashboard;
     </script>
 </body>
 </html>
