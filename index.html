@@ -50,7 +50,7 @@
             <div class="lg:col-span-5 bg-card-dark p-6 rounded-2xl lofi-border flex flex-col justify-between">
                 <div>
                     <div class="flex items-center gap-2 mb-4">
-                        <span class="text-lg">🕒</span>
+                        <span>🕒</span>
                         <h3 class="text-sm font-black uppercase tracking-widest text-pastel-purple">Tactical Schedule Blocks</h3>
                     </div>
                     <div id="dashboard-schedule-timeline" class="space-y-4 max-h-[450px] overflow-y-auto pr-2">
@@ -101,7 +101,27 @@
         const today = new Date();
         document.getElementById('live-date').innerText = today.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
 
+        // Automated Cleanup Matrix: Purges tasks older than 24 hours from storage cache
+        function cleanExpiredTasks() {
+            let existingData = JSON.parse(localStorage.getItem('triage_data')) || { triage_plan: [] };
+            
+            // 24 hours = 24 * 60 * 60 * 1000 = 86,400,000 milliseconds
+            const dynamicExpirationWindow = 24 * 60 * 60 * 1000; 
+            const executionCutoffTime = Date.now() - dynamicExpirationWindow;
+
+            // Retain elements that are younger than 24 hours OR don't possess a timestamp parameter yet
+            existingData.triage_plan = existingData.triage_plan.filter(task => {
+                if (!task.createdAt) return true; 
+                return task.createdAt > executionCutoffTime;
+            });
+            
+            localStorage.setItem('triage_data', JSON.stringify(existingData));
+        }
+
         function synchronizeAndRenderDashboard() {
+            // Run cleanup operations right before rendering fresh state loops
+            cleanExpiredTasks();
+
             // Fetch central application engine schema tracking matrix array
             const data = JSON.parse(localStorage.getItem('triage_data')) || { triage_plan: [] };
             
@@ -179,31 +199,30 @@
             localStorage.setItem('triage_data', JSON.stringify(data));
             synchronizeAndRenderDashboard(); // re-trigger drawing arrays updates
         }
+
         // Function to update time live every second
-    function startLiveClock() {
-        const timeDisplay = document.getElementById('live-date');
-    
-        setInterval(() => {
-            const now = new Date();
-            // Displays format like: 06/26/2026, 10:15:32 AM
-            timeDisplay.innerText = now.toLocaleString('en-US', { 
-                year: 'numeric', 
-                month: '2-digit', 
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: true
-            });
-        }, 1000);
-    }
+        function startLiveClock() {
+            const timeDisplay = document.getElementById('live-date');
+        
+            setInterval(() => {
+                const now = new Date();
+                timeDisplay.innerText = now.toLocaleString('en-US', { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+            }, 1000);
+        }
 
-    // Fire rendering on initialization load routines
-    window.onload = () => {
-        synchronizeAndRenderDashboard();
-        startLiveClock(); // Start the infinite live clock ticker
-    };
-
+        // Fire rendering on initialization load routines
+        window.onload = () => {
+            synchronizeAndRenderDashboard();
+            startLiveClock(); // Start the infinite live clock ticker
+        };
     </script>
 </body>
 </html>

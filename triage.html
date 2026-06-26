@@ -92,7 +92,7 @@
                 // FIXED: Explicitly mapping both parameters into the array iteration handler
                 data.triage_plan.forEach((task, index) => { 
                     task.completed = false;
-                    
+                    task.createdAt = Date.now();
                     let dayOffset = 0;
                     if (task.urgency === 'HIGH') dayOffset = 1;
                     if (task.urgency === 'MEDIUM') dayOffset = 2;
