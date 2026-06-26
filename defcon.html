@@ -39,75 +39,95 @@
             <p class="text-xs text-gray-500 font-mono">STATUS: DYNAMIC EVALUATION ACTIVE</p>
         </div>
 
-        <div id="defcon-container" class="space-y-4">
-            </div>
+        <div id="defcon-container" class="space-y-4"></div>
     </main>
 
     <script>
+        function evaluateTimeEscalation() {
+            let data = JSON.parse(localStorage.getItem('triage_data')) || { triage_plan: [] };
+            let modified = false;
+
+            data.triage_plan.forEach(task => {
+                if (task.completed) return;
+
+                if (!task.created_time) {
+                    task.created_time = Date.now();
+                    modified = true;
+                }
+
+                let ageInSeconds = (Date.now() - task.created_time) / 1000;
+
+                // Tasks escalate in priority automatically every 20 seconds for demonstration purposes
+                if (ageInSeconds > 20 && task.urgency === 'LOW') {
+                    task.urgency = 'MEDIUM';
+                    modified = true;
+                } else if (ageInSeconds > 40 && task.urgency === 'MEDIUM') {
+                    task.urgency = 'HIGH';
+                    modified = true;
+                } else if (ageInSeconds > 60 && task.urgency === 'HIGH') {
+                    task.urgency = 'CRITICAL';
+                    modified = true;
+                }
+            });
+
+            if (modified) {
+                localStorage.setItem('triage_data', JSON.stringify(data));
+                renderDefconHub();
+            }
+        }
+
         function renderDefconHub() {
-            // Pull the universal state object array array
             const data = JSON.parse(localStorage.getItem('triage_data')) || { triage_plan: [] };
             const container = document.getElementById('defcon-container');
             container.innerHTML = '';
 
             if (data.triage_plan.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-16 bg-card-dark lofi-border rounded-2xl text-gray-500 text-sm">
-                        No critical alert streams active right now.<br>
-                        All safe.
-                    </div>`;
+                container.innerHTML = `<div class="text-center py-16 text-gray-500 text-sm">No active alert streams.</div>`;
                 return;
             }
 
-            // Separate tasks into urgent priority categories
             data.triage_plan.forEach((task, idx) => {
                 let badgeStyle = 'border-gray-700 bg-gray-800 text-gray-400';
-                let alertLabel = 'DEFCON 3: STABLE';
+                let alertLabel = '🟢 DEFCON 3: STABLE';
                 
                 if (task.urgency === 'CRITICAL') {
                     badgeStyle = 'border-red-900 bg-red-950/40 text-red-400 animate-pulse';
-                    alertLabel = '🔴 DEFCON 1: IMMEDIATE THREAT';
+                    alertLabel = '🔴 DEFCON 1: IMMEDIATE';
                 } else if (task.urgency === 'HIGH') {
                     badgeStyle = 'border-orange-900 bg-orange-950/30 text-orange-400';
-                    alertLabel = '🟡 DEFCON 2: ELEVATED RISK';
+                    alertLabel = '🟡 DEFCON 2: ELEVATED';
+                } else if (task.urgency === 'MEDIUM') {
+                    badgeStyle = 'border-yellow-900/60 bg-yellow-950/20 text-yellow-400';
+                    alertLabel = '🔵 DEFCON 3: COLD WATCH';
                 }
 
                 const card = document.createElement('div');
-                // Dim the card visually if the user ticks it off as done
                 card.className = `bg-card-dark p-5 rounded-xl lofi-border flex items-center justify-between transition gap-4 ${task.completed ? 'opacity-30' : ''}`;
                 
-                let checkedState = task.completed ? 'checked' : '';
-                let textStrike = task.completed ? 'line-through text-gray-600' : 'text-gray-100';
-
                 card.innerHTML = `
                     <div class="space-y-2 flex-1">
-                        <div class="flex items-center gap-3 flex-wrap">
+                        <div class="flex items-center gap-3">
                             <span class="text-[10px] font-black px-2 py-0.5 rounded border tracking-wider uppercase ${badgeStyle}">${alertLabel}</span>
-                            <span class="text-xs text-pastel-pink font-mono">⏱️ Threshold: ${task.time_block}</span>
                         </div>
-                        <h3 class="text-lg font-bold ${textStrike}">${task.task_title}</h3>
-                        
-                        <div class="text-xs text-gray-400 pl-4 border-l border-[#3a3a40] space-y-1 py-1">
-                            ${task.micro_steps.map(step => `• ${step}`).join('<br>')}
-                        </div>
+                        <h3 class="text-lg font-bold ${task.completed ? 'line-through text-gray-600' : 'text-gray-100'}">${task.task_title}</h3>
                     </div>
-                    <div class="flex items-center">
-                        <input type="checkbox" ${checkedState} onchange="toggleDefconTaskState(${idx})" class="w-6 h-6 accent-pastel rounded cursor-pointer">
-                    </div>
+                    <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleDefconTaskState(${idx})" class="w-6 h-6 accent-pastel rounded cursor-pointer">
                 `;
                 container.appendChild(card);
             });
         }
 
-        // Central cross-page state manager function 
         function toggleDefconTaskState(idx) {
             let data = JSON.parse(localStorage.getItem('triage_data'));
             data.triage_plan[idx].completed = !data.triage_plan[idx].completed;
             localStorage.setItem('triage_data', JSON.stringify(data));
-            renderDefconHub(); // immediately redraw layout to match checked status
+            renderDefconHub();
         }
 
-        window.onload = renderDefconHub;
-    </script>
+        window.onload = () => {
+            renderDefconHub();
+            setInterval(evaluateTimeEscalation, 3000);
+        };
+</script>
 </body>
 </html>

@@ -12,8 +12,7 @@
         .text-pastel-purple { color: #bca0dc; }
         .text-pastel-pink { color: #f2afcd; }
         .accent-pastel { accent-color: #bca0dc; }
-        /* Grid cell sizing for a perfect square look */
-        .calendar-cell { min-height: 100px; }
+        .calendar-cell { min-height: 110px; }
     </style>
 </head>
 <body class="bg-midnight text-gray-200 min-h-screen font-sans tracking-wide">
@@ -34,30 +33,33 @@
 
     <main class="max-w-6xl mx-auto p-6 space-y-6 mt-6">
         <div class="flex items-center justify-between border-b border-[#2b2b30] pb-4">
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-4">
                 <span class="text-2xl">📅</span>
-                <h2 id="calendar-month-year" class="text-xl font-black uppercase tracking-widest text-pastel-purple">MONTHLY TACTICAL GRID</h2>
+                <h2 id="calendar-month-year" class="text-xl font-black uppercase tracking-widest text-pastel-purple">MONTH</h2>
             </div>
-            <p class="text-xs text-gray-500 font-mono">VIEW MODE: MONTHLY OVERVIEW</p>
+            <div class="flex gap-2">
+                <button onclick="navigateMonth(-1)" class="px-3 py-1 bg-midnight border border-[#3a3a40] rounded hover:border-pastel-purple transition text-xs font-bold font-mono">◀ PREV</button>
+                <button onclick="navigateMonth(1)" class="px-3 py-1 bg-midnight border border-[#3a3a40] rounded hover:border-pastel-purple transition text-xs font-bold font-mono">NEXT ▶</button>
+            </div>
         </div>
 
         <div class="bg-card-dark rounded-2xl lofi-border p-4 shadow-2xl">
             <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold uppercase tracking-wider pb-3 border-b border-[#2b2b30] text-gray-400">
-                <div class="text-red-400">Sun</div>
-                <div>Mon</div>
-                <div>Tue</div>
-                <div>Wed</div>
-                <div>Thu</div>
-                <div>Fri</div>
-                <div class="text-pastel-purple">Sat</div>
+                <div class="text-red-400">Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div class="text-pastel-purple">Sat</div>
             </div>
 
-            <div id="monthly-grid-days" class="grid grid-cols-7 gap-2 mt-2">
-                </div>
+            <div id="monthly-grid-days" class="grid grid-cols-7 gap-2 mt-2"></div>
         </div>
     </main>
 
     <script>
+        let displayedDate = new Date();
+
+        function navigateMonth(direction) {
+            displayedDate.setMonth(displayedDate.getMonth() + direction);
+            buildMonthlyGridCalendar();
+        }
+
         function buildMonthlyGridCalendar() {
             const data = JSON.parse(localStorage.getItem('triage_data')) || { triage_plan: [] };
             const gridContainer = document.getElementById('monthly-grid-days');
@@ -65,69 +67,62 @@
             
             gridContainer.innerHTML = '';
 
-            const current = new Date();
-            const year = current.getFullYear();
-            const month = current.getMonth(); // 0-indexed
+            const year = displayedDate.getFullYear();
+            const month = displayedDate.getMonth();
+            const today = new Date();
 
-            // Set Header Text
             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             monthHeader.innerText = `${monthNames[month]} ${year}`;
 
-            // Calculate calendar padding offsets
             const firstDayIndex = new Date(year, month, 1).getDay();
             const totalDaysInMonth = new Date(year, month + 1, 0).getDate();
-            const todayDate = current.getDate();
 
-            // 1. Render Blank Spaces for previous month overlap offset
+            // 1. Render empty spaces for previous month overlap offset
             for (let i = 0; i < firstDayIndex; i++) {
                 gridContainer.insertAdjacentHTML('beforeend', `<div class="bg-midnight/30 rounded-lg calendar-cell border border-transparent"></div>`);
             }
 
             // 2. Build the Actual Day Cells loop
             for (let day = 1; day <= totalDaysInMonth; day++) {
-                let isToday = (day === todayDate) ? 'border-pastel-pink shadow-md shadow-pink-950/20' : 'border-[#2b2b30]';
-                let dayNumColor = (day === todayDate) ? 'text-pastel-pink font-extrabold' : 'text-gray-400';
+                let isCurrentDay = (day === today.getDate() && month === today.getMonth() && year === today.getFullYear());
+                let borderStyle = isCurrentDay ? 'border-pastel-pink shadow-md' : 'border-[#2b2b30]';
+                let dayNumColor = isCurrentDay ? 'text-pastel-pink font-extrabold' : 'text-gray-400';
 
-                // Compile all tasks allocated to build a checklist inside today's cell block element
                 let dayTasksHTML = '';
                 
-                // For hackathon display simulation, we assign the AI triage items directly to today's date block cell
-                if (day === todayDate) {
-                    data.triage_plan.forEach((task, idx) => {
+                data.triage_plan.forEach((task, idx) => {
+                    let taskTargetDay = task.assigned_day ? parseInt(task.assigned_day) : (today.getDate() + (idx % 4)); 
+                    let taskTargetMonth = task.assigned_month ? parseInt(task.assigned_month) : today.getMonth();
+
+                    if (taskTargetDay === day && taskTargetMonth === month) {
                         let textStrike = task.completed ? 'line-through text-gray-600' : 'text-gray-200';
                         let checkedState = task.completed ? 'checked' : '';
                         
                         dayTasksHTML += `
                             <div class="mt-1.5 p-1 bg-midnight rounded border border-gray-800 flex items-start gap-1 text-[10px] leading-tight">
                                 <input type="checkbox" ${checkedState} onchange="toggleDayTask(${idx})" class="mt-0.5 w-3 h-3 accent-pastel rounded cursor-pointer shrink-0">
-                                <span class="truncate ${textStrike}" title="${task.task_title}">
+                                <span class="truncate ${textStrike}">
                                     <span class="text-pastel-purple font-mono font-bold">${task.time_block.split(' ')[0]}</span> ${task.task_title}
                                 </span>
                             </div>
                         `;
-                    });
-                }
+                    }
+                });
 
-                const dayCellHTML = `
-                    <div class="bg-midnight p-2 rounded-xl border-2 ${isToday} calendar-cell flex flex-col justify-between overflow-hidden group hover:border-[#3a3a40] transition">
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs font-mono ${dayNumColor}">${day}</span>
-                        </div>
-                        <div class="flex-1 overflow-y-auto space-y-1 mt-1 scrollbar-none">
-                            ${dayTasksHTML}
-                        </div>
+                gridContainer.insertAdjacentHTML('beforeend', `
+                    <div class="bg-midnight p-2 rounded-xl border-2 ${borderStyle} calendar-cell flex flex-col justify-between overflow-hidden">
+                        <span class="text-xs font-mono ${dayNumColor}">${day}</span>
+                        <div class="flex-1 overflow-y-auto space-y-1 mt-1 scrollbar-none">${dayTasksHTML}</div>
                     </div>
-                `;
-                gridContainer.insertAdjacentHTML('beforeend', dayCellHTML);
+                `);
             }
         }
 
-        // Shared cross-page storage updates
         function toggleDayTask(idx) {
             let data = JSON.parse(localStorage.getItem('triage_data'));
             data.triage_plan[idx].completed = !data.triage_plan[idx].completed;
             localStorage.setItem('triage_data', JSON.stringify(data));
-            buildMonthlyGridCalendar(); // Re-render calendar matrix grid
+            buildMonthlyGridCalendar();
         }
 
         window.onload = buildMonthlyGridCalendar;
