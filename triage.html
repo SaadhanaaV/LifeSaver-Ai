@@ -1,66 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panic Room | LifeSaver AI</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .lofi-border { border: 2px solid #3a3a40; }
-        .bg-midnight { background-color: #121214; }
-        .bg-card-dark { background-color: #1a1a1e; }
-        .text-pastel-purple { color: #bca0dc; }
-        .text-pastel-pink { color: #f2afcd; }
-    </style>
-</head>
-<body class="bg-midnight text-gray-200 min-h-screen font-sans tracking-wide">
-
-    <nav class="bg-card-dark border-b-2 border-[#2b2b30] px-6 py-4 flex justify-between items-center shadow-md">
-        <div class="flex items-center gap-2">
-            <span class="text-2xl">🌙</span>
-            <a href="index.html" class="text-xl font-black text-pastel-purple tracking-wider">LIFESAVER AI</a>
-        </div>
-        <div class="flex gap-6 text-xs font-bold uppercase tracking-widest text-gray-400">
-            <a href="index.html" class="hover:text-pastel-purple transition">🏠 Dashboard</a>
-            <a href="triage.html" class="text-pastel-pink border-b border-pastel-pink pb-1">🧠 Panic Room</a>
-            <a href="defcon.html" class="hover:text-pastel-purple transition">⚠️ DEFCON Hub</a>
-            <a href="calendar.html" class="hover:text-pastel-purple transition">📅 Tactical Calendar</a>
-            <a href="autonomous.html" class="hover:text-pastel-purple transition">🤖 Agent Execution</a>
-        </div>
-    </nav>
-
-    <main class="max-w-3xl mx-auto p-6 mt-10">
-        <div class="bg-card-dark p-8 rounded-2xl lofi-border shadow-2xl space-y-6">
-            <div class="flex items-center gap-3 border-b border-[#2b2b30] pb-4">
-                <span class="text-3xl">🧠</span>
-                <div>
-                    <h2 class="text-xl font-black uppercase tracking-widest text-pastel-purple">Mental Decompression Chamber</h2>
-                    <p class="text-xs text-gray-400 mt-1">Dump your unformatted anxieties, scattered thoughts, due dates, or syllabus timelines below.</p>
-                </div>
-            </div>
-            
-            <div>
-                <label for="brainDump" class="block text-xs font-bold uppercase text-gray-400 mb-2 tracking-widest">RAW TEXT PARSING STREAM:</label>
-                <textarea id="brainDump" rows="6" 
-                    class="w-full bg-midnight border-2 border-[#2b2b30] rounded-xl p-4 text-gray-100 focus:ring-2 focus:ring-pastel-purple focus:outline-none placeholder-gray-600 transition text-sm" 
-                    placeholder="Example: I'm panicking because I have a math exam at 9 AM tomorrow and haven't opened the book, my room is chaotic, and I forgot to email my project lead back with my status update..."></textarea>
-            </div>
-            
-            <button id="triageBtn" class="w-full bg-gradient-to-r from-purple-900 to-indigo-950 hover:from-purple-800 hover:to-indigo-900 text-pastel-purple lofi-border font-bold py-4 rounded-xl transition duration-200 tracking-widest uppercase text-xs shadow-lg">
-                ⚡ Initialize Tactical Triage
-            </button>
-        </div>
-
-        <div id="loading" class="hidden text-center py-12 space-y-3 animate-pulse">
-            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-pastel-pink mx-auto"></div>
-            <p class="text-pastel-pink font-mono text-xs tracking-widest uppercase">Gemini AI is structuring your environment matrix layers...</p>
-        </div>
-    </main>
-
-    <script>
+<script>
         document.getElementById('triageBtn').addEventListener('click', async () => {
             const brainDumpText = document.getElementById('brainDump').value;
             const loading = document.getElementById('loading');
+            const triageBtn = document.getElementById('triageBtn');
             
             if(!brainDumpText.trim()) {
                 alert("Please unload your mental matrix data parameters first!");
@@ -69,7 +11,7 @@
 
             // Engage loading states visually
             loading.classList.remove('hidden');
-            this.disabled = true;
+            triageBtn.disabled = true;
 
             try {
                 // Call your live backend engine on Port 5000
@@ -78,28 +20,33 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ brainDump: brainDumpText })
                 });
-                
+    
                 const data = await response.json();
-                
-                // Initialize clean completed tracking state parameters to false for all objects
+        
+                // 1. Fetch any EXISTING tasks stored previously
+                let existingData = JSON.parse(localStorage.getItem('triage_data')) || { triage_plan: [] };
+        
+                // 2. Initialize completion tracking state on the NEW tasks
                 data.triage_plan.forEach(task => { 
                     task.completed = false; 
                 });
-                
-                // Save directly to the shared local storage pipeline matrix cache
-                localStorage.setItem('triage_data', JSON.stringify(data));
-                
-                // Instantly redirect our user back to the primary desktop home layout
+        
+                // 3. MERGE the new tasks into the existing array list instead of overwriting!
+                existingData.triage_plan = [...existingData.triage_plan, ...data.triage_plan];
+        
+                // 4. Save the combined accumulative matrix back to cache storage
+                localStorage.setItem('triage_data', JSON.stringify(existingData));
+        
+                // Instantly redirect back to the primary dashboard
                 window.location.href = "index.html";
-                
+    
             } catch(err) {
                 console.error(err);
                 alert("Critical Error connecting to structural Gemini endpoint gateway.");
             } finally {
+                // This now closes cleanly, allowing formatters to behave perfectly!
                 loading.classList.add('hidden');
-                this.disabled = false;
+                triageBtn.disabled = false;
             }
         });
     </script>
-</body>
-</html>
