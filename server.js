@@ -66,9 +66,9 @@ app.post('/api/triage', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-// Explicit route to serve the homepage
-import { fileURLToPath } from 'url';
-import path from 'path';
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Security matrix core running live on port ${PORT}`);
+});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
